@@ -1,0 +1,32 @@
+@server=https://localhost
+@port=7181
+
+GET {{server}}:{{port}}/products
+Accept: application/json
+
+###
+GET {{server}}:{{port}}/products/2
+Accept: application/json
+
+###
+POST {{server}}:{{port}}/products
+Content-Type: application/json
+
+{
+    "name": "New Product",
+    "price": 15.99,
+    "description": "Description for New Product"
+}
+
+###
+PUT {{server}}:{{port}}/products/4
+Content-Type: application/json
+
+{
+    "name": "Updated Product",
+    "price": 19.99,
+    "description": "Updated description for Product 4"
+}
+
+###
+DELETE {{server}}:{{port}}/products/1
