@@ -7,7 +7,7 @@ public class ProductService
     private readonly string dataFilePath;
 
     public ProductService(string dataFilePath)
-    {
+        {
         this.dataFilePath = dataFilePath;
     }
 
