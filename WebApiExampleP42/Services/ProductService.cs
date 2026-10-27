@@ -16,6 +16,13 @@ public class ProductService
         return await dataProvider.GetAllAsync();
     }
 
+    public async Task<ICollection<Product>> SearchProductsAsync(SearchProduct searchProduct)
+    {
+        var products = await dataProvider.GetAllAsync();
+        return products.Where(p => p.Price >= searchProduct.MinPrice && p.Price <= searchProduct.MaxPrice).ToList();
+    }
+
+
     public async Task<Product?> GetProductByIdAsync(int id)
     {
         var products = await dataProvider.GetAllAsync();

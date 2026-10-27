@@ -22,6 +22,30 @@ public class ProductController: ControllerBase
         return Ok(products);
     }
 
+    // GET /products/search?minPrice=10&maxPrice=100
+    [HttpGet("search")]
+    public async Task<ActionResult<ICollection<Product>>> SearchProductsAsync([FromQuery] SearchProduct searchProduct)
+    {
+        if (searchProduct.MaxPrice < searchProduct.MinPrice)
+        {
+            return BadRequest("maxPrice must be greater than or equal to minPrice.");
+        }
+        if (searchProduct.MinPrice < 0 || searchProduct.MaxPrice < 0)
+        {
+            return BadRequest("Prices must be non-negative.");
+        }
+        if (searchProduct.MaxPrice == 0)
+        {
+            searchProduct.MaxPrice = decimal.MaxValue; // If maxPrice is 0, treat it as no upper limit
+        }
+
+
+        var products = await productService.SearchProductsAsync(searchProduct);
+        return Ok(products);
+    }
+
+
+    // GET /products/{id}
     [HttpGet("{id:int}")]
     public async Task<ActionResult<Product>> GetProductByIdAsync(int id)
     {
