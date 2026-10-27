@@ -7,7 +7,14 @@ var builder = WebApplication.CreateBuilder(args);
 // Singleton - створюэться одир раз пыд час завантежння і усі подальші запити буде використовуватися
 // дин і той же екземпляр класу ProductService
 var dataFilePath = builder.Configuration["ProductsDataFile"];
-builder.Services.AddSingleton(new ProductService(dataFilePath));
+
+// один раз створюється екземпляр JsonFileProductsProvider і використовується для всіх запитів
+builder.Services.AddSingleton<IDataProvider<Product>>(new JsonFileProductsProvider(dataFilePath));
+// Scoped - створюється один раз на кожен запит, і використовується для всіх об'єктів, які потребують його під час обробки цього запиту
+builder.Services.AddScoped<ProductService>();
+// Transient - створюється новий екземпляр ProductService для кожного запиту, і використовується тільки під час обробки цього запиту
+//builder.Services.AddTransient<ProductService>();
+builder.Services.AddControllers();
 
 builder.Services.AddOpenApi();
 
@@ -25,6 +32,7 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+// Приклад middleware для логування запитів
 app.Use(async (/*HttpContext*/ context, /*Func<Task>*/ next) =>
 {
     var logMessage = $"[{DateTime.Now}] {context.Request.Method} {context.Request.Path} ip:{context.Connection.RemoteIpAddress}";
@@ -42,7 +50,7 @@ app.Use(async (/*HttpContext*/ context, /*Func<Task>*/ next) =>
     await next(context);
 });
 
-app.AddProductsRoutes();
+app.MapControllers();
 
 app.Run();
 
