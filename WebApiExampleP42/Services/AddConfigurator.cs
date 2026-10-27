@@ -7,8 +7,12 @@ public static class AddConfigurator
 {
     public static void AddProductsRoutes(this WebApplication app)
     {
-        app.MapGet("/products", async (ProductService productService) =>
+        app.MapGet("/products", async (ProductService productService, HttpContext httpContext) =>
         {
+            var logMessage = $"[{DateTime.Now}] {httpContext.Request.Method} {httpContext.Request.Path} ip:{httpContext.Connection.RemoteIpAddress}";
+            Console.WriteLine(logMessage);
+
+
             var products = await productService.GetAllProductsAsync();
             return Results.Ok(products);
         });
@@ -20,7 +24,7 @@ public static class AddConfigurator
         // /products/{id:int}
         //            id - назва параметра (наша)   
 
-        app.MapGet("/products/{id:int}", async (int id, ProductService productService) =>
+        app.MapGet("/products/{id:int}", async (int id, ProductService productService, HttpContext httpContext) =>
         {
             var product = await productService.GetProductByIdAsync(id);
             if (product == null)
@@ -37,7 +41,7 @@ public static class AddConfigurator
         });
 
         // Оновити існуючий продукт PUT /products/{id}
-        app.MapPut("/products/{id:int}", async (int id, [FromBody] Product updatedProduct, ProductService productService) =>
+        app.MapPut("/products/{id:int}", async (int id, [FromBody] Product updatedProduct, ProductService productService, HttpContext httpContext) =>
         {
             var product = await productService.UpdateProductAsync(id, updatedProduct); // Зберігаємо продукти
             if (product == null)
@@ -47,7 +51,7 @@ public static class AddConfigurator
             return Results.Ok(product);
         });
         // Видалити продукт за його ідентифікатором DELETE /products/{id}
-        app.MapDelete("/products/{id:int}", async (int id, ProductService productService) =>
+        app.MapDelete("/products/{id:int}", async (int id, ProductService productService, HttpContext httpContext) =>
         {
             var result = await productService.DeleteProductAsync(id);
             if (!result)
@@ -59,3 +63,22 @@ public static class AddConfigurator
     }
 
 }
+
+/*
+ Створити проєкт веб-апі
+
+Для повідомлень
+
+повдомлення
+- ід
+- від кого (адреса)
+- текст повідомлення
+- дата час
+
+
+реалізувати методи отримання усіх повідомлень, отримання одного повідомлення, повідомленнь від одного відправника (параметр адреса)
+видалення повідомленян по ід
+
+стоврити http файл з тестами методів щоб продемонтрувати як вони працюють
+  
+ */

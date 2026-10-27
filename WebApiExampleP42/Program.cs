@@ -25,6 +25,23 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+app.Use(async (/*HttpContext*/ context, /*Func<Task>*/ next) =>
+{
+    var logMessage = $"[{DateTime.Now}] {context.Request.Method} {context.Request.Path} ip:{context.Connection.RemoteIpAddress}";
+    Console.WriteLine(logMessage);
+
+    // Приклад валідації запиту (можна додати власну логіку) і повернення помилки 400 Bad Request, якщо запит не валідний
+    //var valid = true; // TODO implement validation logic
+    //if (!valid)
+    //{
+    //    context.Response.StatusCode = 400; // Bad Request
+    //    await context.Response.WriteAsync("Invalid request");
+    //    return;
+    //}
+
+    await next(context);
+});
+
 app.AddProductsRoutes();
 
 app.Run();
@@ -51,3 +68,17 @@ Microsoft.AspNetCore.OpenApi
 Swashbuckle.AspNetCore.SwaggerUI
   
  */
+
+/*
+Middleware, контролери і маршрути
+
+
+поток вводу - запит - > Middleware - > обробник - > відповідь
+
+поток вводу - запит - > Middleware - > контролер - > маршрут - > метод контролера - > відповідь
+
+
+HttpContext - об'єкт, який містить інформацію про HTTP-запит і HTTP-відповідь. Він надає доступ до таких властивостей, як Request (запит), Response (відповідь), User (користувач), Session (сесія) та інші.
+
+
+ */ 
