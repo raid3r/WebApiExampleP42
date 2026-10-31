@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using WebApiExampleP42.Models;
 using WebApiExampleP42.Services;
+using WebApiExampleP42.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -54,6 +55,7 @@ app.Use(async (/*HttpContext*/ context, /*Func<Task>*/ next) =>
 
     await next(context);
 });
+app.UseMiddleware<UserAutorizationByToken>();
 
 app.MapControllers();
 
