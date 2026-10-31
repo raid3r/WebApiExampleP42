@@ -9,6 +9,11 @@ GET {{server}}:{{port}}/products/2
 Accept: application/json
 
 ###
+GET {{server}}:{{port}}/products/search?minPrice=0&maxPrice=100
+Accept: application/json
+
+
+###
 POST {{server}}:{{port}}/products
 Content-Type: application/json
 
@@ -19,14 +24,14 @@ Content-Type: application/json
 }
 
 ###
-PUT {{server}}:{{port}}/products/4
+PUT {{server}}:{{port}}/products/5
 Content-Type: application/json
 
 {
     "name": "Updated Product",
-    "price": 19.99,
+    "price": 59.99,
     "description": "Updated description for Product 4"
 }
 
 ###
-DELETE {{server}}:{{port}}/products/1
+DELETE {{server}}:{{port}}/products/4

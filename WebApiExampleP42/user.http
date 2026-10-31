@@ -1,0 +1,23 @@
+@server=https://localhost
+@port=7181
+
+POST {{server}}:{{port}}/api/user/register
+Content-Type: application/json
+Accept: application/json
+
+{
+    "name": "bob",
+    "email": "test1@test.com",
+    "password": "111111"
+}
+
+###
+
+POST {{server}}:{{port}}/api/user/login
+Content-Type: application/json
+Accept: application/json
+
+{
+"email": "test1@test.com",
+    "password": "111111"
+}

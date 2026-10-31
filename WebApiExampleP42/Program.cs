@@ -14,6 +14,11 @@ builder.Services.AddSingleton<IDataProvider<Product>>(new JsonFileProductsProvid
 builder.Services.AddScoped<ProductService>();
 // Transient - створюється новий екземпляр ProductService для кожного запиту, і використовується тільки під час обробки цього запиту
 //builder.Services.AddTransient<ProductService>();
+
+
+builder.Services.AddSingleton<IDataProvider<User>>(new JsonFileDataProvider<User>(builder.Configuration["UsersDataFile"]));
+builder.Services.AddScoped<UserService>();
+
 builder.Services.AddControllers();
 
 builder.Services.AddOpenApi();
@@ -88,5 +93,36 @@ Middleware, контролери і маршрути
 
 HttpContext - об'єкт, який містить інформацію про HTTP-запит і HTTP-відповідь. Він надає доступ до таких властивостей, як Request (запит), Response (відповідь), User (користувач), Session (сесія) та інші.
 
+
+
+Створити проєкт веб-апі
+
+Для повідомлень
+
+повдомлення
+- ід
+- від кого (адреса)
+- текст повідомлення
+- дата час
+
+
+реалізувати методи отримання усіх повідомлень, отримання одного повідомлення, повідомленнь від одного відправника (параметр адреса)
+видалення повідомленян по ід
+
+стоврити http файл з тестами методів щоб продемонтрувати як вони працюють
+
+
+---
+
+по цьому завданню зробити реалізацію з використанням контролерів
+а сервіс роботи з повідомленнями розділити на окремі сервіси
+1) сервіс роботи з моделями
+2) сервіс збереження та завантадження з файлу
+підключати їх через ін'єкцію залежностей
+
+Додаткове завдання
+створити middleware який дивиться на параметр з конфігурації Maintenance true/false (параметр в appsettings.json)
+якщо true - запит на будьякий роут повертає відповідь в форматі html з повідомленням що сервер на облуговуванні
+якщо false - все працює як завжди
 
  */ 
