@@ -20,6 +20,10 @@ builder.Services.AddScoped<ProductService>();
 builder.Services.AddSingleton<IDataProvider<User>>(new JsonFileDataProvider<User>(builder.Configuration["UsersDataFile"]));
 builder.Services.AddScoped<UserService>();
 
+builder.Services.AddSingleton<IDataProvider<Message>>(new JsonFileMessagesProvider(builder.Configuration["MessagesDataFile"]));
+builder.Services.AddScoped<MessageService>();
+
+
 builder.Services.AddControllers();
 
 builder.Services.AddOpenApi();
@@ -28,13 +32,15 @@ builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
+app.UseStaticFiles(); // дозволяє обслуговувати статичні файли з wwwroot
+
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
     app.UseSwaggerUI(c =>
     {
         c.SwaggerEndpoint("/openapi/v1.json", "My API V1");
-        c.RoutePrefix = string.Empty; // Set Swagger UI at the app's root
+        c.RoutePrefix = "swagger"; // Set Swagger UI at the app's root
     });
 }
 
@@ -55,7 +61,11 @@ app.Use(async (/*HttpContext*/ context, /*Func<Task>*/ next) =>
 
     await next(context);
 });
-app.UseMiddleware<UserAutorizationByToken>();
+
+app.UseMiddleware<UserAutorizationByToken>(); // додає до Items["User"] користувача, якщо токен валідний, або повертає 401 Unauthorized, якщо токен відсутній або не валідний
+app.UseMiddleware<CheckMessageSender>(); // дістає з Items["User"] користувача і перевіряє чи співпадає його email з From у тілі запиту на відправку повідомлення, якщо ні - повертає 403 Forbidden
+
+
 
 app.MapControllers();
 
@@ -63,7 +73,21 @@ app.Run();
 
 
 
+/*
+ 
+Створити в проєкті з повідомленнями
+модель відправник
+з можливістю
+зареєструватися (пошта, пароль) - отримати токен на відправку 
+авторизуватися (пошта, пароль) - отримати токен на відправку 
 
+метод додавання повідомлення повинен тепер 
+працювати лише тоді коли у полі від кого вказано емейл який було введено при реєстрації
+а в заголовку є токен отриманий через метод авторизації чи реєстрації
+перевірку повинна робити мідлвара (яка перевіряє тільки один маршрут - відправки)
+
+  
+ */
 
 
 

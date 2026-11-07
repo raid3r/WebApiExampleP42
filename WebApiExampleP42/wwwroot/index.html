@@ -1,0 +1,28 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Static Page</title>
+</head>
+<body>
+
+    <h1>Register</h1>
+    <a href="/swagger/index.html">Swagger UI</a>
+
+    <form id="registerForm">
+
+        <label for="name">Name:</label>
+        <input type="text" name="name" placeholder="Name" required />
+        <label for="email">Email:</label>
+        <input type="text" name="email" placeholder="Email" required />
+        <label for="password">Password:</label>
+        <input type="password" name="password" placeholder="Password" required />
+        <div id="register-errors"></div>
+        <button type="submit">Register</button>
+
+    </form>
+
+
+    <script src="/js/script.js"></script>
+</body>
+</html>
