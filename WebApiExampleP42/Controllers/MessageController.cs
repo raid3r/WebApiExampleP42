@@ -11,11 +11,19 @@ namespace WebApiExampleP42.Controllers;
 public class MessageController(MessageService messageService, UserService userService) : ControllerBase
 {
 
-    // отримати усі повідомлення
+    // отримати усі повідомлення // 200 401
     [HttpGet]
-    public async Task<ICollection<Message>> GetAllMessagesAsync()
+    public async Task<IActionResult> GetAllMessagesAsync()
     {
-        return await messageService.GetAllMessagesAsync();
+        var user = HttpContext.Items["User"] as User; 
+        // отримуємо користувача з контексту, який був доданий мідлварою UserAutorizationByToken
+        if (user == null)
+        {
+            return Unauthorized("User is not authorized."); // 401 Unauthorized
+        }
+
+
+        return Ok(await  messageService.GetAllMessagesAsync());
     }
 
     // додати повідомлення

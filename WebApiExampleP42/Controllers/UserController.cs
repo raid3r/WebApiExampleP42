@@ -3,10 +3,14 @@ using WebApiExampleP42.Models;
 using WebApiExampleP42.Models.DTO;
 using WebApiExampleP42.Services;
 using static System.Net.Mime.MediaTypeNames;
+using System.ComponentModel;
+
 namespace WebApiExampleP42.Controllers;
+
 
 [ApiController]
 [Route("api/[controller]")] // api/user
+[Tags("User authentication")]
 public class UserController : ControllerBase
 {
     private readonly UserService _userService;
@@ -20,6 +24,10 @@ public class UserController : ControllerBase
     // реєстрація користувача
 
     [HttpPost("register")]
+    [EndpointSummary("Register a new user")]
+    [EndpointDescription("This endpoint allows you to register a new user by providing their name, email, and password. Upon successful registration, a token will be returned.")]
+    [ProducesResponseType(typeof(UserToken), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<UserToken>> RegisterUserAsync([FromBody] UserRegisterRequest newUser)
     {
         try
@@ -35,6 +43,15 @@ public class UserController : ControllerBase
 
     // авторизація користувача
 
+    /// <summary>
+    /// Login a user and return a token for authentication.
+    /// </summary>
+    /// <param name="loginUser">The login request containing the user's email and password.</param>
+    /// <returns>A UserToken if authentication is successful; otherwise, an Unauthorized response.</returns>
+    /// <response code="200">Returns the user token upon successful authentication.</response>
+    /// <response code="401">Returns Unauthorized if the email or password is invalid.</response>
+    [ProducesResponseType(typeof(UserToken), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status401Unauthorized)]
     [HttpPost("login")]
     public async Task<ActionResult<UserToken>> AuthenticateUserAsync([FromBody] UserLoginRequest loginUser)
     {
