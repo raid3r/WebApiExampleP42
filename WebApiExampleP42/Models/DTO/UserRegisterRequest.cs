@@ -3,8 +3,8 @@
 namespace WebApiExampleP42.Models.DTO;
 
 /// <summary>
-    /// DTO for user registration request containing name, email, and password.
-    /// </summary>
+/// DTO for user registration request containing name, email, and password.
+/// </summary>
 public class UserRegisterRequest
 {
     /// <summary>

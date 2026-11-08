@@ -5,6 +5,11 @@ using WebApiExampleP42.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddAutoMapper(c => { 
+    // ключ
+    c.LicenseKey = "FREE-LIMITED-KEY";
+}, typeof(Program));
+
 // Singleton - створюэться одир раз пыд час завантежння і усі подальші запити буде використовуватися
 // дин і той же екземпляр класу ProductService
 var dataFilePath = builder.Configuration["ProductsDataFile"];

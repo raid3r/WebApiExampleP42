@@ -1,4 +1,7 @@
-﻿namespace WebApiExampleP42.Models.DTO;
+﻿using AutoMapper;
+using WebApiExampleP42.Models;
+
+namespace WebApiExampleP42.Models.DTO;
 
 public class UserViewDto
 {
@@ -7,4 +10,5 @@ public class UserViewDto
     public string Email { get; set; }
     public bool IsActive { get; set; }
     public int RoleId { get; set; }
+    public DateTime CreatedAt { get; set; }
 }

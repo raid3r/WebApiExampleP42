@@ -4,6 +4,7 @@ using WebApiExampleP42.Models.DTO;
 using WebApiExampleP42.Services;
 using static System.Net.Mime.MediaTypeNames;
 using System.ComponentModel;
+using AutoMapper;
 
 namespace WebApiExampleP42.Controllers;
 
@@ -14,10 +15,12 @@ namespace WebApiExampleP42.Controllers;
 public class UserController : ControllerBase
 {
     private readonly UserService _userService;
+    private readonly IMapper _mapper;
 
-    public UserController(UserService userService)
+    public UserController(UserService userService, IMapper mapper)
     {
         _userService = userService;
+        _mapper = mapper;
     }
 
 
@@ -28,12 +31,13 @@ public class UserController : ControllerBase
     [EndpointDescription("This endpoint allows you to register a new user by providing their name, email, and password. Upon successful registration, a token will be returned.")]
     [ProducesResponseType(typeof(UserToken), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<UserToken>> RegisterUserAsync([FromBody] UserRegisterRequest newUser)
+    public async Task<ActionResult<UserToken>> RegisterUserAsync([FromBody] UserRegisterRequest request)
     {
         try
         {
+            var newUser = _mapper.Map<User>(request);   
             var createdUser = await _userService.RegisterAsync(newUser);
-            return Ok(new UserToken { Token = createdUser.Token });
+            return Ok(_mapper.Map<UserToken>(createdUser));
         }
         catch (InvalidOperationException ex)
         {
@@ -60,7 +64,7 @@ public class UserController : ControllerBase
         {
             return Unauthorized("Invalid email or password.");
         }
-        return Ok(new UserToken { Token = user.Token });
+        return Ok(_mapper.Map<UserToken>(user));
     }
 
     // по ід користувача отримати дані користувача
@@ -74,17 +78,29 @@ public class UserController : ControllerBase
     public async Task<ActionResult<ICollection<UserViewDto>>> GetAllUsersAsync()
     {
         var users = await _userService.GetAllAsync();
-        var userDtos = users.Select(u => new UserViewDto
-        {
-            Id = u.Id,
-            Name = u.Name,
-            Email = u.Email,
-            IsActive = u.IsActive,
-            RoleId = u.RoleId
-        }).ToList();
+        var userDtos = users.Select(u => _mapper.Map<UserViewDto>(u)).ToList();
         return Ok(userDtos);
     }
 
+    [HttpGet("{id}")]
+    public async Task<ActionResult<UserViewDto>> GetByIdAsync(int id)
+    {
+        var users = await _userService.GetAllAsync();
+        var user = users.FirstOrDefault(u => u.Id == id);
+        if (user == null)
+        {
+            return NotFound();
+        }
+        var userDto = _mapper.Map<UserViewDto>(user);
+        return Ok(userDto);
+    }
 
+    [HttpGet]
+    public async Task<ActionResult<ICollection<UserViewDto>>> GetAllAsync()
+    {
+        var users = await _userService.GetAllAsync();
+        var userDtos = users.Select(u => _mapper.Map<UserViewDto>(u)).ToList();
+        return Ok(userDtos);
+    }
 
 }

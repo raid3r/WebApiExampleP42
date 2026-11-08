@@ -1,7 +1,31 @@
 ﻿using WebApiExampleP42.Models;
-using WebApiExampleP42.Models.DTO;
 
 namespace WebApiExampleP42.Services;
+
+
+/*
+
+Контроллер
+Дозволено:
+
+
+
+
+Заборонено:
+- містити логіку бізнесу у контролері
+
+Сервіс
+
+
+
+
+
+
+
+
+  
+ 
+ */
 
 public class UserService
 {
@@ -17,21 +41,17 @@ public class UserService
         return await dataProvider.GetAllAsync();
     }
 
-    public async Task<User> RegisterAsync(UserRegisterRequest request)
+    public async Task<User> RegisterAsync(User newUser)
     {
         var users = await dataProvider.GetAllAsync();
+
         // email unique
-        if (users.Any(u => u.Email.Equals(request.Email, StringComparison.OrdinalIgnoreCase)))
+        if (users.Any(u => u.Email.Equals(newUser.Email, StringComparison.OrdinalIgnoreCase)))
         {
             throw new InvalidOperationException("A user with this email already exists.");
         }
 
-        var newUser = new User
-        {
-            Name = request.Name,
-            Email = request.Email,
-            Password = request.Password
-        };
+        
 
         newUser.Token = Guid.NewGuid().ToString(); // Generate a unique token for the user
         newUser.IsActive = true; // Set the user as active by default
