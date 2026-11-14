@@ -27,23 +27,17 @@ namespace WebApiExampleP42.Services;
  
  */
 
-public class UserService
+public class UserService(IRepository<User> userRepository)
 {
-    private readonly IDataProvider<User> dataProvider;
-
-    public UserService(IDataProvider<User> dataProvider)
-    {
-        this.dataProvider = dataProvider;
-    }
 
     public async Task<ICollection<User>> GetAllAsync()
     {
-        return await dataProvider.GetAllAsync();
+        return await userRepository.GetAllAsync();
     }
 
     public async Task<User> RegisterAsync(User newUser)
     {
-        var users = await dataProvider.GetAllAsync();
+        var users = await userRepository.GetAllAsync();
 
         // email unique
         if (users.Any(u => u.Email.Equals(newUser.Email, StringComparison.OrdinalIgnoreCase)))
@@ -57,22 +51,21 @@ public class UserService
         newUser.IsActive = true; // Set the user as active by default
         newUser.RoleId = Roles.User; // Assign the default role (User)
 
-        newUser.Id = users.Any() ? users.Max(u => u.Id) + 1 : 1;
-        users.Add(newUser);
-        await dataProvider.SaveAsync(users);
+        userRepository.Add(newUser);
+        await userRepository.SaveChangesAsync();
         return newUser;
     }
 
     public async Task<User?> AuthenticateAsync(string email, string password)
     {
-        var users = await dataProvider.GetAllAsync();
+        var users = await userRepository.GetAllAsync();
         var user = users.FirstOrDefault(u => u.Email.Equals(email, StringComparison.OrdinalIgnoreCase) && u.Password == password);
         return user;
     }
 
     public async Task<User> CreateUserAsync(User newUser)
     {
-        var users = await dataProvider.GetAllAsync();
+        var users = await userRepository.GetAllAsync();
 
         // email unique
         if (users.Any(u => u.Email.Equals(newUser.Email, StringComparison.OrdinalIgnoreCase)))
@@ -81,14 +74,14 @@ public class UserService
         }
 
         newUser.Id = users.Any() ? users.Max(u => u.Id) + 1 : 1;
-        users.Add(newUser);
-        await dataProvider.SaveAsync(users);
+        userRepository.Add(newUser);
+        await userRepository.SaveChangesAsync();
         return newUser;
     }
 
     public async Task<User?> UpdateUserAsync(User updatedUser)
     {
-        var users = await dataProvider.GetAllAsync();
+        var users = await userRepository.GetAllAsync();
         var user = users.FirstOrDefault(u => u.Id == updatedUser.Id);
         if (user == null)
         {
@@ -106,19 +99,19 @@ public class UserService
         user.Token = updatedUser.Token;
         user.IsActive = updatedUser.IsActive;
         user.RoleId = updatedUser.RoleId;
-        await dataProvider.SaveAsync(users);
+        await userRepository.SaveChangesAsync();
         return user;
     }
 
     public async Task<User?> GetUserByEmailAsync(string email)
     {
-        var users = await dataProvider.GetAllAsync();
+        var users = await userRepository.GetAllAsync();
         return users.FirstOrDefault(u => u.Email.Equals(email, StringComparison.OrdinalIgnoreCase));
     }
 
     public async Task<User?> GetUserByTokenAsync(string token)
     {
-        var users = await dataProvider.GetAllAsync();
+        var users = await userRepository.GetAllAsync();
         return users.FirstOrDefault(u => u.Token == token);
     }
 }

@@ -1,0 +1,31 @@
+@server=https://localhost
+@port=7181
+# user1@test.com
+@token=43292e36-2172-4deb-a8d4-2ed21a59e065
+
+
+GET {{server}}:{{port}}/api/message
+X-My-authorization: {{token}}
+
+###
+
+POST {{server}}:{{port}}/api/message
+X-My-authorization: {{token}}
+Content-Type: application/json
+
+{
+  "from": "test1@test.com",
+  "to": "test3@test.com",
+  "text": "Hello world! 2"
+}
+
+###
+POST {{server}}:{{port}}/api/message
+X-My-authorization: {{token}}
+Content-Type: application/json
+
+{
+  "from": "xxxx@test.com",
+  "to": "test2@test.com",
+  "text": "Hello world!"
+}

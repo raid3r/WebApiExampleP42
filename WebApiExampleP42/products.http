@@ -1,24 +1,25 @@
 @server=https://localhost
 @port=7181
+@token=44b6280f-9251-41ec-b0b3-fd0c4f9842ea
 
 GET {{server}}:{{port}}/products
-X-My-authorization: 44b6280f-9251-41ec-b0b3-fd0c4f9842ea
+X-My-authorization: {{token}}
 Accept: application/json
 
 ###
-GET {{server}}:{{port}}/products/2
-X-My-authorization: 44b6280f-9251-41ec-b0b3-fd0c4f9842ea
+GET {{server}}:{{port}}/products/1
+X-My-authorization: {{token}}
 Accept: application/json
 
 ###
 GET {{server}}:{{port}}/products/search?minPrice=0&maxPrice=100
-X-My-authorization: 44b6280f-9251-41ec-b0b3-fd0c4f9842ea
+X-My-authorization: {{token}}
 Accept: application/json
 
 
 ###
 POST {{server}}:{{port}}/products
-X-My-authorization: 44b6280f-9251-41ec-b0b3-fd0c4f9842ea
+X-My-authorization: {{token}}
 Content-Type: application/json
 
 {
@@ -29,7 +30,7 @@ Content-Type: application/json
 
 ###
 PUT {{server}}:{{port}}/products/5
-X-My-authorization: 44b6280f-9251-41ec-b0b3-fd0c4f9842ea
+X-My-authorization: {{token}}
 Content-Type: application/json
 
 {
@@ -39,5 +40,5 @@ Content-Type: application/json
 }
 
 ###
-DELETE {{server}}:{{port}}/products/4
-X-My-authorization: 44b6280f-9251-41ec-b0b3-fd0c4f9842ea
+DELETE {{server}}:{{port}}/products/1
+X-My-authorization: {{token}}

@@ -39,7 +39,7 @@ public class User
 
     //[RegularExpression(@"^\d{10}$", ErrorMessage = "Invalid INN format.")]
     //public string INN { get; set; } // Tax Identification Number
-
+    public DateTime CreatedAt { get; set; } = DateTime.Now;
 }
 
 /*

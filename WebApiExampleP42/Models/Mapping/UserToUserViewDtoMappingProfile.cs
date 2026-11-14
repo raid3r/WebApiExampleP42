@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using WebApiExampleP42.Models.DTO;
 
-namespace WebApiExampleP42.Models.Mapping;'
+namespace WebApiExampleP42.Models.Mapping;
 
 public class UserToUserViewDtoMappingProfile : Profile
 {

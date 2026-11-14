@@ -6,7 +6,7 @@ Content-Type: application/json
 Accept: application/json
 
 {
-    "name": "bob",
+    "name": "Test User 1",
     "email": "test1@test.com",
     "password": "111111"
 }
@@ -18,6 +18,6 @@ Content-Type: application/json
 Accept: application/json
 
 {
-"email": "test1@test.com",
+    "email": "test1@test.com",
     "password": "111111"
 }

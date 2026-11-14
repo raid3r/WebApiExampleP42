@@ -2,46 +2,39 @@
 
 namespace WebApiExampleP42.Services;
 
-public class ProductService
+public class ProductService(IRepository<Product> productRepository)
 {
-    private readonly IDataProvider<Product> dataProvider;
-
-    public ProductService(IDataProvider<Product> dataProvider)
-    {
-        this.dataProvider = dataProvider;
-    }
-
     public async Task<ICollection<Product>> GetAllProductsAsync()
     {
-        return await dataProvider.GetAllAsync();
+        return await productRepository.GetAllAsync();
     }
 
     public async Task<ICollection<Product>> SearchProductsAsync(SearchProduct searchProduct)
     {
-        var products = await dataProvider.GetAllAsync();
-        return products.Where(p => p.Price >= searchProduct.MinPrice && p.Price <= searchProduct.MaxPrice).ToList();
+        // TODO  не ефективно!!!
+        return await productRepository.GetAllAsync()
+            .ContinueWith(task => task.Result
+                .Where(p => p.Price >= searchProduct.MinPrice && p.Price <= searchProduct.MaxPrice)
+                .ToList());
     }
 
 
     public async Task<Product?> GetProductByIdAsync(int id)
     {
-        var products = await dataProvider.GetAllAsync();
-        return products.FirstOrDefault(p => p.Id == id);
+        return await productRepository.GetByIdAsync(id);
     }
 
     public async Task<Product> AddProductAsync(Product newProduct)
     {
-        var products = await dataProvider.GetAllAsync();
-        newProduct.Id = products.Any() ? products.Max(p => p.Id) + 1 : 1;
-        products.Add(newProduct);
-        await dataProvider.SaveAsync(products);
+        productRepository.Add(newProduct);
+        await productRepository.SaveChangesAsync();
         return newProduct;
+
     }
 
     public async Task<Product?> UpdateProductAsync(int id, Product updatedProduct)
     {
-        var products = await dataProvider.GetAllAsync();
-        var product = products.FirstOrDefault(p => p.Id == id);
+        var product = await productRepository.GetByIdAsync(id);
         if (product == null)
         {
             return null;
@@ -49,20 +42,19 @@ public class ProductService
         product.Name = updatedProduct.Name;
         product.Price = updatedProduct.Price;
         product.Description = updatedProduct.Description;
-        await dataProvider.SaveAsync(products);
+        await productRepository.SaveChangesAsync();
         return product;
     }
 
     public async Task<bool> DeleteProductAsync(int id)
     {
-        var products = await dataProvider.GetAllAsync();
-        var product = products.FirstOrDefault(p => p.Id == id);
+        var product = await productRepository.GetByIdAsync(id);
         if (product == null)
         {
             return false;
         }
-        products.Remove(product);
-        await dataProvider.SaveAsync(products);
+        productRepository.Remove(product);
+        await productRepository.SaveChangesAsync();
         return true;
     }
 }

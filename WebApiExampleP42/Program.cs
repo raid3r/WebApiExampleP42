@@ -2,30 +2,34 @@ using Microsoft.AspNetCore.Mvc;
 using WebApiExampleP42.Models;
 using WebApiExampleP42.Services;
 using WebApiExampleP42.Middlewares;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddAutoMapper(c => { 
+// Дістаємо рядок підключення до бази даних з конфігурації
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+// Налаштовуємо контекст бази даних для використання SQLite
+builder.Services.AddDbContext<ApiDbContext>(options =>
+    options.UseSqlite(connectionString)
+    );
+
+// Додаємо репозиторії для моделей
+builder.Services.AddScoped<IRepository<User>, UserRepository>();
+builder.Services.AddScoped<IRepository<Product>, ProductRepository>();
+builder.Services.AddScoped<IRepository<Message>, MessageRepository>();
+
+
+
+builder.Services.AddAutoMapper(c =>
+{
     // ключ
     c.LicenseKey = "FREE-LIMITED-KEY";
 }, typeof(Program));
 
-// Singleton - створюэться одир раз пыд час завантежння і усі подальші запити буде використовуватися
-// дин і той же екземпляр класу ProductService
-var dataFilePath = builder.Configuration["ProductsDataFile"];
-
-// один раз створюється екземпляр JsonFileProductsProvider і використовується для всіх запитів
-builder.Services.AddSingleton<IDataProvider<Product>>(new JsonFileProductsProvider(dataFilePath));
-// Scoped - створюється один раз на кожен запит, і використовується для всіх об'єктів, які потребують його під час обробки цього запиту
+// Додаємо сервіси для роботи з моделями
 builder.Services.AddScoped<ProductService>();
-// Transient - створюється новий екземпляр ProductService для кожного запиту, і використовується тільки під час обробки цього запиту
-//builder.Services.AddTransient<ProductService>();
-
-
-builder.Services.AddSingleton<IDataProvider<User>>(new JsonFileDataProvider<User>(builder.Configuration["UsersDataFile"]));
 builder.Services.AddScoped<UserService>();
-
-builder.Services.AddSingleton<IDataProvider<Message>>(new JsonFileMessagesProvider(builder.Configuration["MessagesDataFile"]));
 builder.Services.AddScoped<MessageService>();
 
 
@@ -95,8 +99,11 @@ app.Run();
  */
 
 
-
-
+/*
+ Додати AutoMapper пакет до проєкту
+додати профілі перетворень моделей в DTO і навпаки
+використати цей функціонал в своєму прожкті
+ */
 
 
 
@@ -156,4 +163,30 @@ HttpContext - об'єкт, який містить інформацію про H
 якщо true - запит на будьякий роут повертає відповідь в форматі html з повідомленням що сервер на облуговуванні
 якщо false - все працює як завжди
 
- */ 
+ */
+
+
+/*
+ 
+ SOLID 
+  
+ Шар архітектури
+
+    Валідація
+    Контролер
+        DTO моделі на вхід і вихід
+        Розібрати запит на моделі, передати в сервіс
+    Сервіс
+        Бізнесова логіка
+    Репозиторій
+       Моделі
+    DbContext
+       база даних
+    
+
+  
+  
+  
+  
+ */
+

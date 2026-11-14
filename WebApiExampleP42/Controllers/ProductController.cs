@@ -1,19 +1,15 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WebApiExampleP42.Models;
 using WebApiExampleP42.Services;
+using Microsoft.EntityFrameworkCore;
 
 namespace WebApiExampleP42.Controllers;
 
 [ApiController]
 [Route("products")]
-public class ProductController: ControllerBase
+public class ProductController(ProductService productService) : ControllerBase
 {
-    private readonly ProductService productService;
-
-    public ProductController(ProductService productService)
-    {
-        this.productService = productService;
-    }
+    
 
     [HttpGet]
     public async Task<ActionResult<ICollection<Product>>> GetAllProductsAsync()
