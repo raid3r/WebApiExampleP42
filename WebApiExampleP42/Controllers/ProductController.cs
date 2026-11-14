@@ -2,20 +2,51 @@
 using WebApiExampleP42.Models;
 using WebApiExampleP42.Services;
 using Microsoft.EntityFrameworkCore;
-
+using WebApiExampleP42.Models.DTO;
+using AutoMapper;
 namespace WebApiExampleP42.Controllers;
 
 [ApiController]
 [Route("products")]
-public class ProductController(ProductService productService) : ControllerBase
+public class ProductController(ProductService productService, IMapper mapper) : ControllerBase
 {
     
 
-    [HttpGet]
-    public async Task<ActionResult<ICollection<Product>>> GetAllProductsAsync()
+    [HttpGet] // GET /products?page=1&pageSize=10
+    public async Task<ActionResult<PaginatedResult<Product>>> GetProductsByPageAsync(
+        int page = 1, int pageSize = 10
+        )
     {
-        var products = await productService.GetAllProductsAsync();
-        return Ok(products);
+        // пагінація
+        // сортування
+        // фільтрація
+
+        /*
+         * 50 
+         * 
+         * 1-10
+         * 11-20
+         * 21-30
+         * 4 page 31-40
+         * 41-50
+         * 
+         */
+
+        // усі 50 продуктів
+
+        var pageResult = await productService.GetProductsByPageAsync(page, pageSize);
+
+        var pageResultDto = new PaginatedResult<ProductView> // тип DTO, якщо потрібно
+        {
+            Page = pageResult.Page,
+            PageSize = pageResult.PageSize,
+            TotalCount = pageResult.TotalCount,
+            TotalPages = pageResult.TotalPages,
+            Models = pageResult.Models
+            .Select(model => mapper.Map<ProductView>(model)).ToList() // тут можна додати мапінг на DTO, якщо потрібно
+        };
+
+        return Ok(pageResultDto);
     }
 
     // GET /products/search?minPrice=10&maxPrice=100

@@ -1,4 +1,5 @@
 ﻿using WebApiExampleP42.Models;
+using WebApiExampleP42.Models.DTO;
 
 namespace WebApiExampleP42.Services;
 
@@ -8,6 +9,12 @@ public class ProductService(IRepository<Product> productRepository)
     {
         return await productRepository.GetAllAsync();
     }
+
+    public async Task<PaginatedResult<Product>> GetProductsByPageAsync(int page, int pageSize)
+    {
+        return await productRepository.GetPaginatedAsync(page, pageSize);
+    }
+
 
     public async Task<ICollection<Product>> SearchProductsAsync(SearchProduct searchProduct)
     {

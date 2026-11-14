@@ -2,7 +2,7 @@
 @port=7181
 @token=44b6280f-9251-41ec-b0b3-fd0c4f9842ea
 
-GET {{server}}:{{port}}/products
+GET {{server}}:{{port}}/products?page=1&pageSize=5
 X-My-authorization: {{token}}
 Accept: application/json
 
