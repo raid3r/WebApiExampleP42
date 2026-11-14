@@ -10,9 +10,21 @@ public class ProductService(IRepository<Product> productRepository)
         return await productRepository.GetAllAsync();
     }
 
-    public async Task<PaginatedResult<Product>> GetProductsByPageAsync(int page, int pageSize)
+    public async Task<PaginatedResult<Product>> GetProductsByPageAsync(int page, int pageSize, string? orderBy = null)
     {
-        return await productRepository.GetPaginatedAsync(page, pageSize);
+        return await productRepository.GetPaginatedAsync(page, pageSize, query => 
+        {
+            return orderBy switch
+            {
+                "id" => query.OrderBy(p => p.Id),
+                "-id" => query.OrderByDescending(p => p.Id),
+                "name" => query.OrderBy(p => p.Name),
+                "-name" => query.OrderByDescending(p => p.Name),
+                "price" => query.OrderBy(p => p.Price),
+                "-price" => query.OrderByDescending(p => p.Price),
+                _ => query
+            };
+        });
     }
 
 

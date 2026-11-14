@@ -12,13 +12,29 @@ abstract public class BaseRepository<T>(ApiDbContext context) : IRepository<T> w
         return await context.Set<T>().ToListAsync();
     }
 
-    public async Task<PaginatedResult<T>> GetPaginatedAsync(int page, int pageSize)
+    public async Task<PaginatedResult<T>> GetPaginatedAsync(int page, int pageSize, 
+        Func<IQueryable<T>, IQueryable<T>>? orderBy = null
+        //Func<IQueryable<T>, IQueryable<T>>? filter = null
+        )
     {
+        var query = context.Set<T>().AsQueryable();
+
+        if (orderBy != null)
+        {
+            query = orderBy(query);
+        }
+        //if (filter != null)
+        //{
+        //    query = filter(query);
+        //}
+
+
         // SELECT COUNT(*) FROM Table
-        var totalCount = await context.Set<T>().CountAsync();
+        var totalCount = await query.CountAsync();
         var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
-        // SELECT * FROM Table LIMIT pageSize OFFSET (page - 1) * pageSize
-        var models = await context.Set<T>()
+        // SELECT * FROM Table LIMIT pageSize OFFSET (page - 1) * pageSize     
+
+        var models = await query
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();

@@ -10,14 +10,15 @@ namespace WebApiExampleP42.Controllers;
 [Route("products")]
 public class ProductController(ProductService productService, IMapper mapper) : ControllerBase
 {
-    
 
-    [HttpGet] // GET /products?page=1&pageSize=10
+    // price - по зростанню, -price - по спаданню
+    // name - по алфавіту, -name - по зворотньому алфавіту
+    [HttpGet] // GET /products?page=1&pageSize=10?orderBy=price
     public async Task<ActionResult<PaginatedResult<Product>>> GetProductsByPageAsync(
-        int page = 1, int pageSize = 10
+        int page = 1, int pageSize = 10, string? orderBy = null
         )
     {
-        // пагінація
+        // + пагінація
         // сортування
         // фільтрація
 
@@ -34,7 +35,7 @@ public class ProductController(ProductService productService, IMapper mapper) : 
 
         // усі 50 продуктів
 
-        var pageResult = await productService.GetProductsByPageAsync(page, pageSize);
+        var pageResult = await productService.GetProductsByPageAsync(page, pageSize, orderBy);
 
         var pageResultDto = new PaginatedResult<ProductView> // тип DTO, якщо потрібно
         {
