@@ -13,27 +13,34 @@ abstract public class BaseRepository<T>(ApiDbContext context) : IRepository<T> w
     }
 
     public async Task<PaginatedResult<T>> GetPaginatedAsync(int page, int pageSize, 
-        Func<IQueryable<T>, IQueryable<T>>? orderBy = null
-        //Func<IQueryable<T>, IQueryable<T>>? filter = null
+        Func<IQueryable<T>, IQueryable<T>>? orderBy = null,
+        Func<IQueryable<T>, IQueryable<T>>? filter = null
         )
     {
         var query = context.Set<T>().AsQueryable();
 
+        // + сортування
         if (orderBy != null)
         {
+            // ORDER BY Name ASC
             query = orderBy(query);
         }
-        //if (filter != null)
-        //{
-        //    query = filter(query);
-        //}
+        // + фільтрація
+        if (filter != null)
+        {
+            // WHERE Price > 100 AND Price< 500
+            query = filter(query);
+        }
 
-
-        // SELECT COUNT(*) FROM Table
+        
+        // + пагінація
+        // SELECT COUNT(*) FROM Table WHERE Price > 100 AND Price < 500
         var totalCount = await query.CountAsync();
         var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
-        // SELECT * FROM Table LIMIT pageSize OFFSET (page - 1) * pageSize     
 
+        // SELECT * FROM Table LIMIT pageSize OFFSET (page - 1) * pageSize
+        // WHERE Price > 100 AND Price < 500
+        // ORDER BY Name ASC    
         var models = await query
             .Skip((page - 1) * pageSize)
             .Take(pageSize)

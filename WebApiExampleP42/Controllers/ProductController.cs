@@ -15,27 +15,15 @@ public class ProductController(ProductService productService, IMapper mapper) : 
     // name - по алфавіту, -name - по зворотньому алфавіту
     [HttpGet] // GET /products?page=1&pageSize=10?orderBy=price
     public async Task<ActionResult<PaginatedResult<Product>>> GetProductsByPageAsync(
-        int page = 1, int pageSize = 10, string? orderBy = null
+        [FromQuery] PageResultRequest<ProductFilter> pageResultRequest
         )
     {
         // + пагінація
-        // сортування
-        // фільтрація
+        // + сортування
+        // + фільтрація
 
-        /*
-         * 50 
-         * 
-         * 1-10
-         * 11-20
-         * 21-30
-         * 4 page 31-40
-         * 41-50
-         * 
-         */
-
-        // усі 50 продуктів
-
-        var pageResult = await productService.GetProductsByPageAsync(page, pageSize, orderBy);
+        
+        var pageResult = await productService.GetProductsByPageAsync(pageResultRequest);
 
         var pageResultDto = new PaginatedResult<ProductView> // тип DTO, якщо потрібно
         {

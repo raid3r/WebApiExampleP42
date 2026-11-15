@@ -1,4 +1,4 @@
-﻿namespace WebApiExampleP42.Models;
+﻿namespace WebApiExampleP42.Models.DTO;
 
 public class SearchProduct
 {

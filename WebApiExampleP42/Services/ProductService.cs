@@ -10,21 +10,59 @@ public class ProductService(IRepository<Product> productRepository)
         return await productRepository.GetAllAsync();
     }
 
-    public async Task<PaginatedResult<Product>> GetProductsByPageAsync(int page, int pageSize, string? orderBy = null)
+    private static Func<IQueryable<Product>, IQueryable<Product>>? GetApplyOrderFunc(string? orderBy)
     {
-        return await productRepository.GetPaginatedAsync(page, pageSize, query => 
+        return orderBy switch
         {
-            return orderBy switch
+            "id" => query => query.OrderBy(p => p.Id),
+            "-id" => query => query.OrderByDescending(p => p.Id),
+            "name" => query => query.OrderBy(p => p.Name),
+            "-name" => query => query.OrderByDescending(p => p.Name),
+            "price" => query => query.OrderBy(p => p.Price),
+            "-price" => query => query.OrderByDescending(p => p.Price),
+            _ => null
+        };
+    }
+
+    private static Func<IQueryable<Product>, IQueryable<Product>>? GetApplyFilterFunc(ProductFilter? filter)
+    {
+        if (filter == null)
+        {
+            return null;
+        }
+        return query =>
+        {
+            if (filter.MinPrice.HasValue)
             {
-                "id" => query.OrderBy(p => p.Id),
-                "-id" => query.OrderByDescending(p => p.Id),
-                "name" => query.OrderBy(p => p.Name),
-                "-name" => query.OrderByDescending(p => p.Name),
-                "price" => query.OrderBy(p => p.Price),
-                "-price" => query.OrderByDescending(p => p.Price),
-                _ => query
-            };
-        });
+                query = query.Where(p => p.Price >= filter.MinPrice.Value);
+            }
+            if (filter.MaxPrice.HasValue)
+            {
+                query = query.Where(p => p.Price <= filter.MaxPrice.Value);
+            }
+            if (!string.IsNullOrEmpty(filter.Name))
+            {
+                query = query.Where(p => p.Name.Contains(filter.Name));
+            }
+            if (!string.IsNullOrEmpty(filter.Description))
+            {
+                query = query.Where(p => p.Description.Contains(filter.Description));
+            }
+            return query;
+        };
+    }
+
+
+    public async Task<PaginatedResult<Product>> GetProductsByPageAsync(PageResultRequest<ProductFilter> pageResultRequest)
+    {
+        // + пагінація
+        // + сортування
+        // + фільтрація
+        return await productRepository.GetPaginatedAsync(
+            pageResultRequest.Page, 
+            pageResultRequest.PageSize, 
+            GetApplyOrderFunc(pageResultRequest.OrderBy), 
+            GetApplyFilterFunc(pageResultRequest.Filter));
     }
 
 

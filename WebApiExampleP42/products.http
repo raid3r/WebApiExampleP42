@@ -2,11 +2,18 @@
 @port=7181
 @token=44b6280f-9251-41ec-b0b3-fd0c4f9842ea
 
-GET {{server}}:{{port}}/products?page=1&pageSize=5&orderBy=name
+GET {{server}}:{{port}}/products?page=1&pageSize=10&orderBy=-name
 X-My-authorization: {{token}}
 Accept: application/json
 
 ###
+
+GET {{server}}:{{port}}/products?page=1&pageSize=10&orderBy=name&Filter.MinPrice=30&Filter.MaxPrice=100
+X-My-authorization: {{token}}
+Accept: application/json
+
+###
+
 GET {{server}}:{{port}}/products/1
 X-My-authorization: {{token}}
 Accept: application/json
