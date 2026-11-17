@@ -3,7 +3,7 @@ using WebApiExampleP42.Models.DTO;
 
 namespace WebApiExampleP42.Services;
 
-public class ProductService(IRepository<Product> productRepository)
+public class ProductService(IRepository<Product> productRepository, FileUploadService fileUploadService)
 {
     public async Task<ICollection<Product>> GetAllProductsAsync()
     {
@@ -99,6 +99,25 @@ public class ProductService(IRepository<Product> productRepository)
         product.Name = updatedProduct.Name;
         product.Price = updatedProduct.Price;
         product.Description = updatedProduct.Description;
+        product.Image = updatedProduct.Image;
+        await productRepository.SaveChangesAsync();
+        return product;
+    }
+
+    public async Task<Product?> UpdateProductImageAsync(int id, IFormFile imageFile)
+    {
+        var product = await productRepository.GetByIdAsync(id);
+        if (product == null)
+        {
+            return null;
+        }
+        var newImage = await fileUploadService.UploadFileAsync(imageFile);
+        var oldImage = product.Image;
+        if (oldImage != null)
+        {
+            await fileUploadService.DeleteImageFileAsync(oldImage);
+        }
+        product.Image = newImage;
         await productRepository.SaveChangesAsync();
         return product;
     }
@@ -109,6 +128,11 @@ public class ProductService(IRepository<Product> productRepository)
         if (product == null)
         {
             return false;
+        }
+        var oldImage = product.Image;
+        if (oldImage != null)
+        {
+            await fileUploadService.DeleteImageFileAsync(oldImage);
         }
         productRepository.Remove(product);
         await productRepository.SaveChangesAsync();

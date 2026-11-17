@@ -101,4 +101,16 @@ public class ProductController(ProductService productService, IMapper mapper) : 
         }
         return Ok();
     }
+
+    [HttpPost("{id:int}/image")]
+    public async Task<ActionResult<Product>> UpdateProductImageAsync(int id, [FromForm] IFormFile imageFile)
+    {
+        var product = await productService.GetProductByIdAsync(id);
+        if (product == null)
+        {
+            return NotFound();
+        }
+        var updatedProduct = await productService.UpdateProductImageAsync(id, imageFile);
+        return Ok(updatedProduct);
+    }
 }

@@ -7,7 +7,7 @@ public class Product
     public decimal Price { get; set; }
     public string Description { get; set; } = string.Empty;
 
-    public string? Image { get; set; }
+    public ImageFile? Image { get; set; }
 
 
 }
