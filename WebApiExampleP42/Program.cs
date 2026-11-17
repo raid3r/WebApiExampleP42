@@ -32,6 +32,7 @@ builder.Services.AddScoped<ProductService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<MessageService>();
 
+builder.Services.AddScoped<FileUploadService>();
 
 builder.Services.AddControllers();
 
@@ -205,6 +206,10 @@ HttpContext - об'єкт, який містить інформацію про H
 - редагування існуючої категорії
 - видалення існуючої категорії
 
+
+Додати пагінацію по 5 категорій на сторінку
+Додати сортування по назві категорії за зростанням і спаданням
+Додати поле фільтрації по назві категорії
 
 
 
