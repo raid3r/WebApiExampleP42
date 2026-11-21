@@ -14,7 +14,8 @@ abstract public class BaseRepository<T>(ApiDbContext context) : IRepository<T> w
 
     public async Task<PaginatedResult<T>> GetPaginatedAsync(int page, int pageSize, 
         Func<IQueryable<T>, IQueryable<T>>? orderBy = null,
-        Func<IQueryable<T>, IQueryable<T>>? filter = null
+        Func<IQueryable<T>, IQueryable<T>>? filter = null,
+        Func<IQueryable<T>, IQueryable<T>>? include = null
         )
     {
         var query = context.Set<T>().AsQueryable();
@@ -30,6 +31,12 @@ abstract public class BaseRepository<T>(ApiDbContext context) : IRepository<T> w
         {
             // WHERE Price > 100 AND Price< 500
             query = filter(query);
+        }
+
+        // + include вкладених об'єктів
+        if (include != null)
+        {
+            query = include(query);
         }
 
         
@@ -57,9 +64,14 @@ abstract public class BaseRepository<T>(ApiDbContext context) : IRepository<T> w
     }
 
 
-    public async Task<T?> GetByIdAsync(int id)
+    public async Task<T?> GetByIdAsync(int id, Func<IQueryable<T>, IQueryable<T>>? include = null)
     {
-        return await context.Set<T>().FindAsync(id);
+        var query = context.Set<T>().AsQueryable();
+        if (include != null)
+        {
+            query = include(query);
+        }
+        return await query.FirstOrDefaultAsync(e => EF.Property<int>(e, "Id") == id);
     }
     public void Add(T entity)
     {

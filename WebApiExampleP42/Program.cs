@@ -18,6 +18,7 @@ builder.Services.AddDbContext<ApiDbContext>(options =>
 builder.Services.AddScoped<IRepository<User>, UserRepository>();
 builder.Services.AddScoped<IRepository<Product>, ProductRepository>();
 builder.Services.AddScoped<IRepository<Message>, MessageRepository>();
+builder.Services.AddScoped<IRepository<Category>, CategoryRepository>();
 
 
 
@@ -29,12 +30,18 @@ builder.Services.AddAutoMapper(c =>
 
 // Додаємо сервіси для роботи з моделями
 builder.Services.AddScoped<ProductService>();
+builder.Services.AddScoped<CategoryService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<MessageService>();
 
 builder.Services.AddScoped<FileUploadService>();
 
-builder.Services.AddControllers();
+
+// product -> category  X   -> products -> category -> products -> category -> products ....
+
+builder.Services.AddControllers()
+    .AddJsonOptions(o =>
+        o.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles);
 
 builder.Services.AddOpenApi();
 

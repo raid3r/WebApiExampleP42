@@ -10,7 +10,9 @@ public class ProductMappingProfile: Profile
         CreateMap<Product, ProductView>()
             .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
             .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
-            .ForMember(dest => dest.Price, opt => opt.MapFrom(src => src.Price));
+            .ForMember(dest => dest.Price, opt => opt.MapFrom(src => src.Price))
+            .ForMember(dest => dest.Category, opt => opt.MapFrom(src => src.Category))
+            ;
     }
 
 }

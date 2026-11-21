@@ -1,9 +1,17 @@
-﻿using WebApiExampleP42.Models;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
+using WebApiExampleP42.Models;
 using WebApiExampleP42.Models.DTO;
+using Microsoft.EntityFrameworkCore.Query;
 
 namespace WebApiExampleP42.Services;
 
-public class ProductService(IRepository<Product> productRepository, FileUploadService fileUploadService)
+public class ProductService(
+    IRepository<Product> productRepository, 
+    IRepository<Category> categoryRepository,
+    FileUploadService fileUploadService,
+    IMapper mapper
+    )
 {
     public async Task<ICollection<Product>> GetAllProductsAsync()
     {
@@ -52,44 +60,58 @@ public class ProductService(IRepository<Product> productRepository, FileUploadSe
         };
     }
 
+    private static Func<IQueryable<Product>, IQueryable<Product>>? GetApplyIncludeFunc()
+    {
+        return query => query.Include(p => p.Category);
+    }
 
-    public async Task<PaginatedResult<Product>> GetProductsByPageAsync(PageResultRequest<ProductFilter> pageResultRequest)
+
+    public async Task<PaginatedResult<ProductView>> GetProductsByPageAsync(PageResultRequest<ProductFilter> pageResultRequest)
     {
         // + пагінація
         // + сортування
         // + фільтрація
-        return await productRepository.GetPaginatedAsync(
-            pageResultRequest.Page, 
-            pageResultRequest.PageSize, 
-            GetApplyOrderFunc(pageResultRequest.OrderBy), 
-            GetApplyFilterFunc(pageResultRequest.Filter));
+
+        var result = await productRepository.GetPaginatedAsync(
+            pageResultRequest.Page,
+            pageResultRequest.PageSize,
+            GetApplyOrderFunc(pageResultRequest.OrderBy),
+            GetApplyFilterFunc(pageResultRequest.Filter),
+            GetApplyIncludeFunc()
+            );
+
+        return mapper.Map<PaginatedResult<ProductView>>(result);
     }
 
-
-    public async Task<ICollection<Product>> SearchProductsAsync(SearchProduct searchProduct)
-    {
-        // TODO  не ефективно!!!
-        return await productRepository.GetAllAsync()
-            .ContinueWith(task => task.Result
-                .Where(p => p.Price >= searchProduct.MinPrice && p.Price <= searchProduct.MaxPrice)
-                .ToList());
-    }
-
-
+        
     public async Task<Product?> GetProductByIdAsync(int id)
     {
-        return await productRepository.GetByIdAsync(id);
+        return await productRepository.GetByIdAsync(id, GetApplyIncludeFunc());
     }
 
-    public async Task<Product> AddProductAsync(Product newProduct)
+    public async Task<Product> AddProductAsync(ProductUpdateRequest request)
     {
+        var category = await categoryRepository.GetByIdAsync(request.CategoryId);
+        if (category == null)
+        {
+            throw new ArgumentException($"Category with ID {request.CategoryId} does not exist.");
+        }
+
+        var newProduct = new Product
+        {
+            Name = request.Name,
+            Description = request.Description,
+            Price = request.Price,
+            Category = category
+        };
+
         productRepository.Add(newProduct);
         await productRepository.SaveChangesAsync();
         return newProduct;
 
     }
 
-    public async Task<Product?> UpdateProductAsync(int id, Product updatedProduct)
+    public async Task<Product?> UpdateProductAsync(int id, ProductUpdateRequest updatedProduct)
     {
         var product = await productRepository.GetByIdAsync(id);
         if (product == null)
@@ -99,7 +121,15 @@ public class ProductService(IRepository<Product> productRepository, FileUploadSe
         product.Name = updatedProduct.Name;
         product.Price = updatedProduct.Price;
         product.Description = updatedProduct.Description;
-        product.Image = updatedProduct.Image;
+
+        var newCategoryId = updatedProduct.CategoryId;
+        var category = await categoryRepository.GetByIdAsync(newCategoryId);
+        if (category == null)
+        {
+            throw new ArgumentException($"Category with ID {newCategoryId} does not exist.");
+        }
+
+        product.Category = category;
         await productRepository.SaveChangesAsync();
         return product;
     }

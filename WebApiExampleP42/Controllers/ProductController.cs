@@ -38,57 +38,34 @@ public class ProductController(ProductService productService, IMapper mapper) : 
         return Ok(pageResultDto);
     }
 
-    // GET /products/search?minPrice=10&maxPrice=100
-    [HttpGet("search")]
-    public async Task<ActionResult<ICollection<Product>>> SearchProductsAsync([FromQuery] SearchProduct searchProduct)
-    {
-        if (searchProduct.MaxPrice < searchProduct.MinPrice)
-        {
-            return BadRequest("maxPrice must be greater than or equal to minPrice.");
-        }
-        if (searchProduct.MinPrice < 0 || searchProduct.MaxPrice < 0)
-        {
-            return BadRequest("Prices must be non-negative.");
-        }
-        if (searchProduct.MaxPrice == 0)
-        {
-            searchProduct.MaxPrice = decimal.MaxValue; // If maxPrice is 0, treat it as no upper limit
-        }
-
-
-        var products = await productService.SearchProductsAsync(searchProduct);
-        return Ok(products);
-    }
-
-
     // GET /products/{id}
     [HttpGet("{id:int}")]
-    public async Task<ActionResult<Product>> GetProductByIdAsync(int id)
+    public async Task<ActionResult<ProductView>> GetProductByIdAsync(int id)
     {
         var product = await productService.GetProductByIdAsync(id);
         if (product == null)
         {
             return NotFound(); // 404 Not Found
         }
-        return Ok(product);
+        return Ok(mapper.Map<ProductView>(product));
     }
 
     [HttpPost]
-    public async Task<ActionResult<Product>> AddProductAsync([FromBody] Product newProduct)
+    public async Task<ActionResult<ProductView>> AddProductAsync([FromBody] ProductUpdateRequest request)
     {
-        var product = await productService.AddProductAsync(newProduct);
-        return Ok(product);
+        var product = await productService.AddProductAsync(request);
+        return Ok(mapper.Map<ProductView>(product));
     }
         
     [HttpPut("{id:int}")]
-    public async Task<ActionResult<Product>> UpdateProductAsync(int id, [FromBody] Product updatedProduct)
+    public async Task<ActionResult<ProductView>> UpdateProductAsync(int id, [FromBody] ProductUpdateRequest updatedProduct)
     {
         var product = await productService.UpdateProductAsync(id, updatedProduct);
         if (product == null)
         {
             return NotFound();
         }
-        return Ok(product);
+        return Ok(mapper.Map<ProductView>(product));
     }
 
     [HttpDelete("{id:int}")]
@@ -103,7 +80,7 @@ public class ProductController(ProductService productService, IMapper mapper) : 
     }
 
     [HttpPost("{id:int}/image")]
-    public async Task<ActionResult<Product>> UpdateProductImageAsync(int id, [FromForm] IFormFile imageFile)
+    public async Task<ActionResult<ProductView>> UpdateProductImageAsync(int id, [FromForm] IFormFile imageFile)
     {
         var product = await productService.GetProductByIdAsync(id);
         if (product == null)
@@ -111,6 +88,6 @@ public class ProductController(ProductService productService, IMapper mapper) : 
             return NotFound();
         }
         var updatedProduct = await productService.UpdateProductImageAsync(id, imageFile);
-        return Ok(updatedProduct);
+        return Ok(mapper.Map<ProductView>(updatedProduct));
     }
 }

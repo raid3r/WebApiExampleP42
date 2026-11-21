@@ -14,7 +14,7 @@ Accept: application/json
 
 ###
 
-GET {{server}}:{{port}}/products/1
+GET {{server}}:{{port}}/products/10
 X-My-authorization: {{token}}
 Accept: application/json
 
@@ -36,14 +36,15 @@ Content-Type: application/json
 }
 
 ###
-PUT {{server}}:{{port}}/products/5
+PUT {{server}}:{{port}}/products/10
 X-My-authorization: {{token}}
 Content-Type: application/json
 
 {
     "name": "Updated Product",
     "price": 59.99,
-    "description": "Updated description for Product 4"
+    "description": "Updated description for Product 4",
+    "categoryId": 1
 }
 
 ###

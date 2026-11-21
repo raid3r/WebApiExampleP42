@@ -9,5 +9,5 @@ public class Product
 
     public ImageFile? Image { get; set; }
 
-
+    public virtual Category? Category { get; set; }
 }

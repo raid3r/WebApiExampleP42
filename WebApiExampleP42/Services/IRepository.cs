@@ -9,9 +9,10 @@ public interface IRepository<T> where T : class
         int page, 
         int pageSize, 
         Func<IQueryable<T>, IQueryable<T>>? orderBy,
-        Func<IQueryable<T>, IQueryable<T>>? filter
+        Func<IQueryable<T>, IQueryable<T>>? filter,
+        Func<IQueryable<T>, IQueryable<T>>? include = null 
         );
-    Task<T?> GetByIdAsync(int id);
+    Task<T?> GetByIdAsync(int id, Func<IQueryable<T>, IQueryable<T>>? include = null);
     void Add(T entity);
     void Remove(T entity);
     Task SaveChangesAsync();

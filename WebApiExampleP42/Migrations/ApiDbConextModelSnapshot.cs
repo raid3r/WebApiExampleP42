@@ -17,6 +17,27 @@ namespace WebApiExampleP42.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.15");
 
+            modelBuilder.Entity("WebApiExampleP42.Models.Category", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Categories");
+                });
+
             modelBuilder.Entity("WebApiExampleP42.Models.ImageFile", b =>
                 {
                     b.Property<int>("Id")
@@ -71,6 +92,9 @@ namespace WebApiExampleP42.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<int?>("CategoryId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -86,6 +110,8 @@ namespace WebApiExampleP42.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
 
                     b.HasIndex("ImageId");
 
@@ -130,11 +156,22 @@ namespace WebApiExampleP42.Migrations
 
             modelBuilder.Entity("WebApiExampleP42.Models.Product", b =>
                 {
+                    b.HasOne("WebApiExampleP42.Models.Category", "Category")
+                        .WithMany("Products")
+                        .HasForeignKey("CategoryId");
+
                     b.HasOne("WebApiExampleP42.Models.ImageFile", "Image")
                         .WithMany()
                         .HasForeignKey("ImageId");
 
+                    b.Navigation("Category");
+
                     b.Navigation("Image");
+                });
+
+            modelBuilder.Entity("WebApiExampleP42.Models.Category", b =>
+                {
+                    b.Navigation("Products");
                 });
 #pragma warning restore 612, 618
         }

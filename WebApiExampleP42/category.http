@@ -1,0 +1,55 @@
+@server=https://localhost
+@port=7181
+@token=44b6280f-9251-41ec-b0b3-fd0c4f9842ea
+
+GET {{server}}:{{port}}/categories?page=1&pageSize=10&orderBy=-name
+X-My-authorization: {{token}}
+Accept: application/json
+
+###
+
+GET {{server}}:{{port}}/categories/1
+X-My-authorization: {{token}}
+Accept: application/json
+
+###
+POST {{server}}:{{port}}/categories
+X-My-authorization: {{token}}
+Content-Type: application/json
+
+{
+    "name": "Food"
+}
+
+###
+POST {{server}}:{{port}}/categories
+X-My-authorization: {{token}}
+Content-Type: application/json
+
+{
+    "name": "Electronics"
+}
+
+###
+POST {{server}}:{{port}}/categories
+X-My-authorization: {{token}}
+Content-Type: application/json
+
+{
+    "name": "Drinks"
+}
+
+
+
+###
+PUT {{server}}:{{port}}/categories/1
+X-My-authorization: {{token}}
+Content-Type: application/json
+
+{
+    "name": "Updated Category"
+}
+
+###
+DELETE {{server}}:{{port}}/categories/1
+X-My-authorization: {{token}}
