@@ -124,10 +124,12 @@ public class ProductService(
 
         var newCategoryId = updatedProduct.CategoryId;
         var category = await categoryRepository.GetByIdAsync(newCategoryId);
-        if (category == null)
-        {
-            throw new ArgumentException($"Category with ID {newCategoryId} does not exist.");
-        }
+        
+        // перенесено в валідацію FluentValidation
+        //if (category == null)
+        //{
+        //    throw new ArgumentException($"Category with ID {newCategoryId} does not exist.");
+        //}
 
         product.Category = category;
         await productRepository.SaveChangesAsync();

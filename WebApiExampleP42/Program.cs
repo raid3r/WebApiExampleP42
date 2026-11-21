@@ -3,6 +3,8 @@ using WebApiExampleP42.Models;
 using WebApiExampleP42.Services;
 using WebApiExampleP42.Middlewares;
 using Microsoft.EntityFrameworkCore;
+using FluentValidation;
+using WebApiExampleP42.Models.Validation;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,6 +30,8 @@ builder.Services.AddAutoMapper(c =>
     c.LicenseKey = "FREE-LIMITED-KEY";
 }, typeof(Program));
 
+builder.Services.AddValidatorsFromAssemblyContaining<Program>();
+
 // Додаємо сервіси для роботи з моделями
 builder.Services.AddScoped<ProductService>();
 builder.Services.AddScoped<CategoryService>();
@@ -39,7 +43,10 @@ builder.Services.AddScoped<FileUploadService>();
 
 // product -> category  X   -> products -> category -> products -> category -> products ....
 
-builder.Services.AddControllers()
+builder.Services.AddControllers(o =>
+{
+    o.Filters.Add<FluentValidationActionFilter>();
+})
     .AddJsonOptions(o =>
         o.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles);
 

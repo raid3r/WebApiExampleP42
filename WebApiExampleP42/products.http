@@ -41,11 +41,12 @@ X-My-authorization: {{token}}
 Content-Type: application/json
 
 {
-    "name": "Updated Product",
-    "price": 59.99,
+    "name": "Updated",
+    "price": 99.99,
     "description": "Updated description for Product 4",
-    "categoryId": 1
+    "categoryId": 2
 }
+###
 
 ###
 DELETE {{server}}:{{port}}/products/1
