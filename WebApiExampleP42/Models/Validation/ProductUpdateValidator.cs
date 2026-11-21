@@ -29,9 +29,7 @@ public class ProductUpdateValidator: AbstractValidator<ProductUpdateRequest>
             .MustAsync(CategoryExists).WithMessage("Category does not exist.");
             
 
-        RuleFor(x => x)
-            .MustAsync(ValidateProductByCategory)
-            .WithMessage("Product does not meet category-specific validation rules.");
+        RuleFor(x => x).CustomAsync(ValidateProductByCategory);
 
     }
 
@@ -42,26 +40,32 @@ public class ProductUpdateValidator: AbstractValidator<ProductUpdateRequest>
     }
 
     // в щалежності від категорії різні правила валідації для продукту
-    private async Task<bool> ValidateProductByCategory(ProductUpdateRequest product, CancellationToken cancellationToken)
+    private async Task ValidateProductByCategory(
+        ProductUpdateRequest product, 
+        ValidationContext<ProductUpdateRequest> context,
+        CancellationToken cancellationToken
+        )
     {
         var category = await _categoryRepository.GetByIdAsync(product.CategoryId);
         if (category == null)
         {
-            return false; // категорія не існує
+            context.AddFailure("CategoryId", $"Category with ID {product.CategoryId} does not exist.");
+            return;
         }
         // Приклад: якщо категорія "Electronics", то ціна повинна бути більше 100
-        if (category.Name == "Electronics" && product.Price <= 100)
+        if (category!.Name == "Electronics" && product.Price <= 100)
         {
-            return false;
+            context.AddFailure("Price", "For Electronics category, price must be greater than 100.");
+            return;
         }
 
         if (category.Name == "Food" && product.Price > 50)
         {
-            return false;
+            context.AddFailure("Price", "For Food category, price must be less than or equal to 50.");
+            return;
         }
 
         // Додайте інші правила валідації для різних категорій за потреби
-        return true;
     }
 
 }
