@@ -72,6 +72,8 @@ public class ProductService(
         // + сортування
         // + фільтрація
 
+        throw new NotImplementedException("Implement GetProductsByPageAsync method in ProductService.");
+
         var result = await productRepository.GetPaginatedAsync(
             pageResultRequest.Page,
             pageResultRequest.PageSize,

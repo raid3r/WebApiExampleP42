@@ -5,6 +5,7 @@ using WebApiExampleP42.Middlewares;
 using Microsoft.EntityFrameworkCore;
 using FluentValidation;
 using WebApiExampleP42.Models.Validation;
+using WebApiExampleP42.Errors;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,9 +38,10 @@ builder.Services.AddScoped<ProductService>();
 builder.Services.AddScoped<CategoryService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<MessageService>();
-
 builder.Services.AddScoped<FileUploadService>();
 
+builder.Services.AddProblemDetails(); // Додаємо підтримку ProblemDetails для обробки помилок
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>(); // Додаємо власний глобальний обробник помилок
 
 // product -> category  X   -> products -> category -> products -> category -> products ....
 
@@ -55,6 +57,8 @@ builder.Services.AddOpenApi();
 // TODO налашутвання роботи з кодуванням JSON
 
 var app = builder.Build();
+app.UseExceptionHandler(); // Додаємо middleware для обробки винятків
+
 
 app.UseStaticFiles(); // дозволяє обслуговувати статичні файли з wwwroot
 
@@ -244,6 +248,7 @@ FluentValidation.DependencyInjectionExtensions
 і переробити усю валідацію в проєкті на використання FluentValidation
 замість атрибутів
 
-  
+  UserRegisterRequest
+
  */
 
