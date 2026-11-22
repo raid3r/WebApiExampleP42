@@ -45,7 +45,7 @@ builder.Services.AddScoped<FileUploadService>();
 
 builder.Services.AddControllers(o =>
 {
-    o.Filters.Add<FluentValidationActionFilter>();
+   // o.Filters.Add<FluentValidationActionFilter>();
 })
     .AddJsonOptions(o =>
         o.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles);
@@ -234,6 +234,16 @@ HttpContext - об'єкт, який містить інформацію про H
 якщо завантажили новий файл - фон змінюється на новий файл
 
   
+
+
+Підлючити до проєкту 
+
+FluentValidation
+FluentValidation.DependencyInjectionExtensions
+
+і переробити усю валідацію в проєкті на використання FluentValidation
+замість атрибутів
+
   
  */
 

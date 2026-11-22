@@ -1,14 +1,21 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using WebApiExampleP42.Models;
-using WebApiExampleP42.Services;
+﻿using AutoMapper;
+using FluentValidation;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using WebApiExampleP42.Models;
 using WebApiExampleP42.Models.DTO;
-using AutoMapper;
+using WebApiExampleP42.Models.Validation;
+using WebApiExampleP42.Services;
 namespace WebApiExampleP42.Controllers;
 
 [ApiController]
 [Route("products")]
-public class ProductController(ProductService productService, IMapper mapper) : ControllerBase
+public class ProductController(
+    ProductService productService, 
+    IMapper mapper,
+    ProductUpdateValidator productUpdateValidator
+    ) : ControllerBase
 {
 
     // price - по зростанню, -price - по спаданню
@@ -51,19 +58,40 @@ public class ProductController(ProductService productService, IMapper mapper) : 
     }
 
     [HttpPost]
-    public async Task<ActionResult<ProductView>> AddProductAsync([FromBody] ProductUpdateRequest request)
+    public async Task<ActionResult> AddProductAsync(
+        [FromBody] ProductUpdateRequest request
+        )
     {
+        var validationResult = await productUpdateValidator.ValidateAsync(request);
+        if (!validationResult.IsValid)
+        {
+            return BadRequest(new ValidationProblemDetails(validationResult.ToDictionary()));
+        }
+
         var product = await productService.AddProductAsync(request);
         return Ok(mapper.Map<ProductView>(product));
     }
         
     [HttpPut("{id:int}")]
-    public async Task<ActionResult<ProductView>> UpdateProductAsync(int id, [FromBody] ProductUpdateRequest updatedProduct)
+    public async Task<ActionResult<ProductView>> UpdateProductAsync(
+        int id, 
+        [FromBody] ProductUpdateRequest request
+        )
     {
-        var product = await productService.UpdateProductAsync(id, updatedProduct);
+        var validationResult = await productUpdateValidator.ValidateAsync(request);
+        // додавання своєї власної помилки валідації, якщо потрібно
+        //validationResult.Errors
+        //    .Add(new FluentValidation.Results.ValidationFailure("Id", "Id is required for update."));
+        if (!validationResult.IsValid)
+        {
+            return BadRequest(new ValidationProblemDetails(validationResult.ToDictionary()));
+        }
+
+        var product = await productService.UpdateProductAsync(id, request);
         if (product == null)
         {
-            return NotFound();
+            validationResult.Errors.Add(new FluentValidation.Results.ValidationFailure("Id", $"Product with ID {id} does not exist."));
+            return BadRequest(new ValidationProblemDetails(validationResult.ToDictionary()));
         }
         return Ok(mapper.Map<ProductView>(product));
     }

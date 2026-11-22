@@ -36,13 +36,13 @@ Content-Type: application/json
 }
 
 ###
-PUT {{server}}:{{port}}/products/10
+PUT {{server}}:{{port}}/products/50
 X-My-authorization: {{token}}
 Content-Type: application/json
 
 {
     "name": "Updated",
-    "price": 99.99,
+    "price": 100.99,
     "description": "Updated description for Product 4",
     "categoryId": 2
 }
